@@ -4,7 +4,7 @@
 
 Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers. 
 
-Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/case-study-1/)
+Full description: **[Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/case-study-1/)**!
 
 ## Entity Relationaship Diagram
 ![изображение](https://user-images.githubusercontent.com/98699089/156034410-8775d5d2-eda5-4453-9e33-54bfef253084.png)
@@ -14,10 +14,4 @@ Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/
 
 #### 1. What is the total amount each customer spent at the restaurant?
 
-````sql
-select s.customer_id , sum(m.price) as total_amount_spent
-from dannys_diner.sales s inner join dannys_diner.menu m on s.product_id = m.product_id
-group by s.customer_id 
-order by sum(m.price) DESC
-  ````
 
