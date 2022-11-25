@@ -13,3 +13,11 @@ Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/
 ## Case Study Questions
 
 #### 1. What is the total amount each customer spent at the restaurant?
+
+````sql
+select s.customer_id , sum(m.price) as total_amount_spent
+from dannys_diner.sales s inner join dannys_diner.menu m on s.product_id = m.product_id
+group by s.customer_id 
+order by sum(m.price) DESC
+  ````
+
