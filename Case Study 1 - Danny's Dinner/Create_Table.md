@@ -1,3 +1,6 @@
+## Create Table
+
+```sql
 CREATE TABLE sales (
   "customer_id" VARCHAR(1),
   "order_date" DATE,
@@ -48,6 +51,6 @@ INSERT INTO members
 VALUES
   ('A', '2021-01-07'),
   ('B', '2021-01-09');
-  
+``` 
   
 	
