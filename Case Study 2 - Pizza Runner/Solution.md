@@ -38,9 +38,15 @@
 
 ## Case Study Questions
 
-Before you start writing your SQL queries however - you might want to investigate the data, you may want to do something with some of those null values and data types in the customer_orders and runner_orders tables!
+This case study has LOTS of questions - they are broken up by area of focus including:
 
-A. Pizza Metrics
+- Pizza Metrics
+- Runner and Customer Experience
+- Ingredient Optimisation
+- Pricing and Ratings
+- Bonus DML Challenges (DML = Data Manipulation Language)
+
+## A. Pizza Metrics
 
 1. How many pizzas were ordered?
 2. How many unique customer orders were made?
@@ -53,4 +59,4 @@ A. Pizza Metrics
 9. What was the total volume of pizzas ordered for each hour of the day?
 10. What was the volume of orders for each day of the week?
 
-ANSWER :
+## ANSWER :
