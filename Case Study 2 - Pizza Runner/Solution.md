@@ -6,41 +6,6 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 
 Full description: [Case Study #2 - Pizza Runner ](https://8weeksqlchallenge.com/case-study-2/)
 
-1. runners table shows the registration_date for each new runner :
-- runner_id
-- registration_date
-
-2. customer_orders table are captured in the customer_orders table with 1 row for each individual pizza that is part of the order.
-- The pizza_id relates to the type of pizza which was ordered whilst the exclusions are
-- the ingredient_id values which should be removed from the pizza and the extras are
-- the ingredient_id values which need to be added to the pizza.
-- order_id
-- customer_id
-- pizza_id
-- exclusions
-- extras
-- order_time
-
-3. runner_orders table shows :
-- order_id
-- runner_id
-- pickup_time
-- distance
-- duration
-- cancellation
-
-4. pizza_names table
-- pizza_id
-- pizza_name
-
-5. pizza_recipes
-- pizza_id
-- toppings
-
-6. pizza_toppings
-- topping_id
-- topping_names
-
 
 ## Case Study Questions
 
@@ -52,10 +17,24 @@ This case study has LOTS of questions - they are broken up by area of focus incl
 - Pricing and Ratings
 - Bonus DML Challenges (DML = Data Manipulation Language)
 
+
+
 ## A. Pizza Metrics
 
 1. How many pizzas were ordered?
+```sql
+SELECT COUNT(pizza_id)as total_pizza
+FROM customer_orders;
+```
+
+
 2. How many unique customer orders were made?
+```sql
+SELECT COUNT(DISTINCT order_id)as total_customer_order
+FROM customer_orders;
+```
+
+
 3. How many successful orders were delivered by each runner?
 4. How many of each type of pizza was delivered?
 5. How many Vegetarian and Meatlovers were ordered by each customer?
@@ -65,4 +44,3 @@ This case study has LOTS of questions - they are broken up by area of focus incl
 9. What was the total volume of pizzas ordered for each hour of the day?
 10. What was the volume of orders for each day of the week?
 
-## ANSWER :
