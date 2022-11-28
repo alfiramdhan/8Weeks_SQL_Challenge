@@ -173,7 +173,7 @@ The most popular item for customer 105 was Vegetarian once
 ```sql
 SELECT order_id,
 		COUNT(pizza_id)as total_pizza
-FROM customer_orders
+FROM customer_orders_cleaned
 GROUP BY 1
 ORDER BY total_pizza DESC;
 ```
@@ -182,11 +182,29 @@ The maximum number of pizzas delivered in one order is 3
 
 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 ```sql
-
+SELECT customer_id,
+		sum(case when (exclusions IS NOT NULL or extras IS NOT NULL) THEN 1 ELSE 0 END)as perform_change,
+		sum(case when (exclusions IS NULL and extras IS NULL) THEN 1 ELSE 0 END)as no_change
+FROM customer_orders_cleaned
+GROUP BY 1
+ORDER BY 1;
 ```
+For customer 101, has a total of 3 pizza deliveries that didn't change
+
+For customer 102, has a total of 3 pizza deliveries that didn't change
+
+For customer 103, has a total of 4 pizza deliveries that performed change
+
+For customer 104, has a total of 1 pizza deliveries that didn't change and 2 pizza deliveries that performed change
+
+For customer 105, has a total of 1 pizza deliveries that performed change
 
 
-12. How many pizzas were delivered that had both exclusions and extras?
-13. What was the total volume of pizzas ordered for each hour of the day?
-14. What was the volume of orders for each day of the week?
+8. How many pizzas were delivered that had both exclusions and extras?
+```sql
+
+
+
+10. What was the total volume of pizzas ordered for each hour of the day?
+11. What was the volume of orders for each day of the week?
 
