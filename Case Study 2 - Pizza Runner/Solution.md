@@ -101,7 +101,7 @@ CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
 SELECT COUNT(pizza_id)as total_pizza
 FROM customer_orders;
 ```
-a total of 14 pizzas ordered
+There were 14 of pizza ordered
 
 
 2. How many unique customer orders were made?
@@ -109,7 +109,7 @@ a total of 14 pizzas ordered
 SELECT COUNT(DISTINCT order_id)as total_customer_order
 FROM customer_orders;
 ```
-a total of 10 orders were made
+There were 10 orders made
 
 
 3. How many successful orders were delivered by each runner?
@@ -117,11 +117,17 @@ a total of 10 orders were made
 As the runner_orders table is not neat so it needs to be corrected first, then we can use the Temp runner_orders_cleaned to find the answer
 
 ```sql
-SELECT COUNT(order_id)as total_successful_orders
+SELECT runner_id,
+	COUNT(order_id)as total_successful_orders
 FROM runner_orders_cleaned
-WHERE cancellation IS null;
+WHERE cancellation IS null
+GROUP BY 1;
 ```
-the total orders that were successfully delivered by each runner were 8
+The first runner successfully delivered 4 orders
+
+The second runner successfully delivered 3 orders
+
+And the third runner successfully delivered 1 order
 
 
 4. How many of each type of pizza was delivered?
@@ -138,9 +144,25 @@ GROUP BY 1
 ORDER BY 1;
 ```
 Pizza type 1 successfully sent 9
+
 pizza type 2 successfully delivered 3
 
+
 5. How many Vegetarian and Meatlovers were ordered by each customer?
+```sql
+SELECT customer_id,
+		sum(case when cc.pizza_id = 1 THEN 1 ELSE 0 END)as Meatlovers,
+		sum(case when cc.pizza_id = 2 THEN 1 ELSE 0 END)as Vegetarian
+FROM customer_orders_cleaned cc, pizza_names pn
+WHERE cc.pizza_id = pn.pizza_id
+GROUP BY 1	
+ORDER BY 1;
+```
+The most popular pizza for customer 101 was Meatlovers, they purchased it 3 times
+
+The most popular item for customer B was curry, ramen and sushi, they purchased each dish 2 times
+
+The most popular item for customer C was ramen, they purchased it 3 times
 
 
 9. What was the maximum number of pizzas delivered in a single order?
