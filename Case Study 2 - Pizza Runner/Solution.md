@@ -158,14 +158,22 @@ WHERE cc.pizza_id = pn.pizza_id
 GROUP BY 1	
 ORDER BY 1;
 ```
-The most popular pizza for customer 101 was Meatlovers, they purchased it 3 times
+The most popular pizza for customer 101 was Meatlovers, they purchased it 2 times then Vegetarian once
 
-The most popular item for customer B was curry, ramen and sushi, they purchased each dish 2 times
+The most popular item for customer 102 was Meatlovers, they purchased it 2 times then Vegetarian once
 
-The most popular item for customer C was ramen, they purchased it 3 times
+The most popular item for customer 103 was Meatlovers, they purchased it 3 times then Vegetarian once
+
+The most popular item for customer 104 was Meatlovers, they purchased it 3 times
+
+The most popular item for customer 105 was Vegetarian once
 
 
-9. What was the maximum number of pizzas delivered in a single order?
+6. What was the maximum number of pizzas delivered in a single order?
+```sql
+
+
+
 10. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 11. How many pizzas were delivered that had both exclusions and extras?
 12. What was the total volume of pizzas ordered for each hour of the day?
