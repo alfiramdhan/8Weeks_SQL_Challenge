@@ -171,11 +171,22 @@ The most popular item for customer 105 was Vegetarian once
 
 6. What was the maximum number of pizzas delivered in a single order?
 ```sql
+SELECT order_id,
+		COUNT(pizza_id)as total_pizza
+FROM customer_orders
+GROUP BY 1
+ORDER BY total_pizza DESC;
+```
+The maximum number of pizzas delivered in one order is 3
 
 
+7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+```sql
 
-10. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
-11. How many pizzas were delivered that had both exclusions and extras?
-12. What was the total volume of pizzas ordered for each hour of the day?
-13. What was the volume of orders for each day of the week?
+```
+
+
+12. How many pizzas were delivered that had both exclusions and extras?
+13. What was the total volume of pizzas ordered for each hour of the day?
+14. What was the volume of orders for each day of the week?
 
