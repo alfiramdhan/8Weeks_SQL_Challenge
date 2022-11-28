@@ -4,6 +4,8 @@ Danny was sold on the idea, but he knew that pizza alone was not going to help h
 
 Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runner Headquarters (otherwise known as Danny’s house) and also maxed out his credit card to pay freelance developers to build a mobile app to accept orders from customers.
 
+Before you start writing your SQL queries however - you might want to investigate the data, you may want to do something with some of those null values and data types in the customer_orders and runner_orders tables!
+
 Full description: [Case Study #2 - Pizza Runner ](https://8weeksqlchallenge.com/case-study-2/)
 
 
@@ -18,6 +20,79 @@ This case study has LOTS of questions - they are broken up by area of focus incl
 - Bonus DML Challenges (DML = Data Manipulation Language)
 
 
+## BEFORE ANSWERING THE QUESTIONS, LET'S BEGIN BY FIXING THE TABLES
+```sql
+DROP TABLE IF EXISTS customer_orders_cleaned
+CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
+  SELECT order_id,
+          customer_id,
+          pizza_id,
+          CASE
+             WHEN exclusions = '' THEN NULL
+             WHEN exclusions = 'null' THEN NULL
+             ELSE exclusions
+          END as exclusions,
+          CASE
+             WHEN extras = '' THEN NULL
+             WHEN extras = 'null' THEN NULL
+             ELSE extras
+          END as extras,
+          order_time
+  FROM customer_orders
+  )
+    SELECT 
+          ROW_NUMBER() OVER(ORDER BY order_id, pizza_id) as row_order,
+          order_id,
+          customer_id,
+          pizza_id,
+          exclusions,
+          extras,
+          order_time
+    FROM first_layer ;
+```    
+    
+```sql
+  DROP TABLE IF EXISTS runner_orders_cleaned;
+    CREATE TEMP TABLE runner_orders_cleaned AS WITH first_layer AS (
+      SELECT
+        order_id,
+        runner_id,
+        CAST(
+          CASE
+            WHEN pickup_time = 'null' THEN NULL
+            ELSE pickup_time
+          END AS timestamp
+        ) AS pickup_time,
+        CASE
+          WHEN distance = '' THEN NULL
+          WHEN distance = 'null' THEN NULL
+          ELSE distance
+        END as distance,
+        CASE
+          WHEN duration = '' THEN NULL
+          WHEN duration = 'null' THEN NULL
+          ELSE duration
+        END as duration,
+        CASE
+          WHEN cancellation = '' THEN NULL
+          WHEN cancellation = 'null' THEN NULL
+          ELSE cancellation
+        END as cancellation
+      FROM
+        runner_orders
+    )
+    SELECT
+      order_id,
+      runner_id,
+      CASE WHEN order_id = '3' THEN (pickup_time + INTERVAL '13 hour') ELSE pickup_time END AS pickup_time,
+      CAST( regexp_replace(distance, '[a-z]+', '' ) AS DECIMAL(5,2) ) AS distance,
+    	CAST( regexp_replace(duration, '[a-z]+', '' ) AS INT ) AS duration,
+    	cancellation
+    FROM
+      first_layer;
+```
+
+
 
 ## A. Pizza Metrics
 
@@ -26,6 +101,7 @@ This case study has LOTS of questions - they are broken up by area of focus incl
 SELECT COUNT(pizza_id)as total_pizza
 FROM customer_orders;
 ```
+a total of 14 pizzas ordered
 
 
 2. How many unique customer orders were made?
@@ -33,14 +109,43 @@ FROM customer_orders;
 SELECT COUNT(DISTINCT order_id)as total_customer_order
 FROM customer_orders;
 ```
+a total of 10 orders were made
 
 
 3. How many successful orders were delivered by each runner?
+
+As the runner_orders table is not neat so it needs to be corrected first, then we can use the Temp runner_orders_cleaned to find the answer
+
+```sql
+SELECT COUNT(order_id)as total_successful_orders
+FROM runner_orders_cleaned
+WHERE cancellation IS null;
+```
+the total orders that were successfully delivered by each runner were 8
+
+
 4. How many of each type of pizza was delivered?
+
+As the customer_orders table is not neat so it needs to be corrected first, then we can use the Temp runner_orders_cleaned to find the answer
+
+```sql
+SELECT pizza_id,
+		COUNT(pizza_id)as total_pizza
+FROM customer_orders_cleaned cc, runner_orders_cleaned rc
+WHERE cc.order_id = rc.order_id
+	AND cancellation IS NULL
+GROUP BY 1	
+ORDER BY 1;
+```
+Pizza type 1 successfully sent 9
+pizza type 2 successfully delivered 3
+
 5. How many Vegetarian and Meatlovers were ordered by each customer?
-6. What was the maximum number of pizzas delivered in a single order?
-7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
-8. How many pizzas were delivered that had both exclusions and extras?
-9. What was the total volume of pizzas ordered for each hour of the day?
-10. What was the volume of orders for each day of the week?
+
+
+9. What was the maximum number of pizzas delivered in a single order?
+10. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+11. How many pizzas were delivered that had both exclusions and extras?
+12. What was the total volume of pizzas ordered for each hour of the day?
+13. What was the volume of orders for each day of the week?
 
