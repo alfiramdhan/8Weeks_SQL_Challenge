@@ -1,5 +1,7 @@
 ## BEFORE ANSWERING THE QUESTIONS, LET'S BEGIN BY FIXING THE TABLES
 
+We need to fix data from customer order and runner order table and we need to do combination of both table with JOIN function, because pizza metric will use both table a lot.
+
 --PART 1: FIXING THE TABLES
 -- First: customer_orders
 --- Creating a view ---
