@@ -1,5 +1,7 @@
 ## BEFORE ANSWERING THE QUESTIONS, LET'S BEGIN BY FIXING THE TABLES
 
+We need to fix the data from the customer orders and runner orders tables because the pizza metrics will make heavy use of both tables
+
 --PART 1: FIXING THE TABLES
 -- First: customer_orders
 --- Creating a view ---
