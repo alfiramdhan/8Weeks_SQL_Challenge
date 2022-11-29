@@ -177,7 +177,7 @@ FROM customer_orders_cleaned
 GROUP BY 1
 ORDER BY total_pizza DESC;
 ```
-The maximum number of pizzas delivered in one order is 3
+The maximum number of pizzas delivered in a single order was 3
 
 
 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
@@ -202,9 +202,22 @@ For customer 105, has a total of 1 pizza deliveries that performed change
 
 8. How many pizzas were delivered that had both exclusions and extras?
 ```sql
+SELECT sum(case when (exclusions IS NOT NULL and extras IS NOT NULL) THEN 1 ELSE 0 END)as perform_change
+FROM customer_orders_cleaned;
+```
+There were a total of 2 pizza deliveries that had both exclusions and extras
 
 
+9. What was the total volume of pizzas ordered for each hour of the day?
+```sql
+select extract(hour from order_time)as pizza_hour,
+		count(extract(hour from order_time))as number_pizza_ordered,
+		ROUND(count(extract(hour from order_time))*100/sum(count(*)) OVER(),2)as total_volume
+from customer_orders_cleaned
+group by 1
+order by 1
+```
 
-10. What was the total volume of pizzas ordered for each hour of the day?
-11. What was the volume of orders for each day of the week?
+10. What was the volume of orders for each day of the week?
+```sql
 
