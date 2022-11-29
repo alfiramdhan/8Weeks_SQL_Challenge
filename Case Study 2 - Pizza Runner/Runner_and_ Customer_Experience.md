@@ -177,3 +177,23 @@ ORDER BY 1,2
 ```
 
 7. What is the successful delivery percentage for each runner?
+```sql
+SELECT runner_id,
+		round(SUM(successful_order::numeric)*100 / COUNT(successful_order::numeric),2) as percentage
+FROM(		
+	select runner_id,
+			order_id,
+			cancellation,
+			case when cancellation IS NULL then 1 ELSE 0 END as successful_order
+	from join_table
+	GROUP BY
+        runner_id,
+        order_id,
+        cancellation
+      ORDER BY
+        runner_id, order_id)AS a
+GROUP BY 1
+ORDER BY 1;
+```
+
+
