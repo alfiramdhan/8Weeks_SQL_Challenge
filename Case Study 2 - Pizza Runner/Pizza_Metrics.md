@@ -1,4 +1,8 @@
 ## BEFORE ANSWERING THE QUESTIONS, LET'S BEGIN BY FIXING THE TABLES
+
+--PART 1: FIXING THE TABLES
+-- First: customer_orders
+--- Creating a view ---
 ```sql
 DROP TABLE IF EXISTS customer_orders_cleaned
 CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
@@ -29,6 +33,8 @@ CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
     FROM first_layer ;
 ```    
     
+-----------------------------------------------
+-- Second: runner_orders:    
 ```sql
   DROP TABLE IF EXISTS runner_orders_cleaned;
     CREATE TEMP TABLE runner_orders_cleaned AS WITH first_layer AS (
