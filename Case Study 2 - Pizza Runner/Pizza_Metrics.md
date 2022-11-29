@@ -220,4 +220,10 @@ order by 1
 
 10. What was the volume of orders for each day of the week?
 ```sql
-
+select to_char(order_time, 'Day')as pizza_day,
+		count(to_char(order_time, 'Day'))as number_pizza_ordered,
+		ROUND(count(to_char(order_time, 'Day'))*100/sum(count(*)) OVER(),2)as total_volume
+from customer_orders_cleaned
+group by 1
+order by 1
+```
