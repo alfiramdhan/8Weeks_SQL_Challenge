@@ -164,7 +164,12 @@ FROM join_table)as temp_table
 
 6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
 ```sql
-
+SELECT runner_id,
+		order_id,
+		ROUND(AVG(distance::numeric / (duration::numeric/60)),2)as average_speed
+FROM join_table
+GROUP BY 1,2
+ORDER BY 1,2
 ```
 
 7. What is the successful delivery percentage for each runner?
