@@ -81,7 +81,7 @@ CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
 
 -----------------------------------------------
 -- New temp table for this part
-
+```sql
 DROP TABLE IF EXISTS join_table;
     CREATE TEMP TABLE join_table AS
 	SELECT co.order_id,
@@ -96,6 +96,7 @@ DROP TABLE IF EXISTS join_table;
 		LEFT JOIN runner_orders_cleaned rc ON co.order_id = rc.order_id
 	WHERE rc.cancellation IS NULL	
 	ORDER BY 1;
+```	
 -----------------------------------------------------------
 
 
