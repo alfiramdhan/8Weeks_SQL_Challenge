@@ -68,6 +68,9 @@ CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
     SELECT
       order_id,
       runner_id,
+      
+      -- adding INTERVAL '13 hour' in order_id = 3 because order_time for this id at 23:51:23
+      
       CASE WHEN order_id = '3' THEN (pickup_time + INTERVAL '13 hour') ELSE pickup_time END AS pickup_time,
       CAST( regexp_replace(distance, '[a-z]+', '' ) AS DECIMAL(5,2) ) AS distance,
     	CAST( regexp_replace(duration, '[a-z]+', '' ) AS INT ) AS duration,
