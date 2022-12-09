@@ -96,14 +96,24 @@ The most purchased item on the menu was ramen, it was purchased 8 times in total
 #### 5. Which item was the most popular for each customer?
 
 ````sql
+WITH rank_order AS (
+	SELECT t1.customer_id,
+			product_name,
+			COUNT(t1.product_id)as total_items,
+			ROW_NUMBER () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
+	FROM dannys_dinner.sales t1
+	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+	GROUP BY 1,2
+	ORDER BY 3 desc
+)
+	
 SELECT customer_id,
-		product_name,
-		count(s.product_id)as total_purchase,
-		ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY count(s.product_id) DESC)as row_popular
-FROM sales s, menu m
-WHERE s.product_id = m.product_id
-GROUP BY 1,2
-ORDER BY 1, 3 DESC;
+	product_name,
+	total_items,
+	rn
+FROM rank_order
+WHERE rn=1
+ORDER BY 1;
 ````
 The most popular item for customer A was ramen, they purchased it 3 times
 
