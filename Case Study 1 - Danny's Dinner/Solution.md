@@ -82,14 +82,13 @@ The first (and the only) purchase for customer C was ramen
 #### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
 ````sql
-SELECT product_name,
-	count(s.product_id)as total_purchase,
-	ROW_NUMBER() OVER(ORDER BY count(s.product_id) DESC)as row_total_items,
-	RANK() OVER(ORDER BY count(s.product_id) DESC)as rank_total_items
-FROM menu m, sales s
-WHERE m.product_id = s.product_id
-GROUP BY 1
-ORDER BY 2 DESC;
+SELECT t1.product_id,
+	product_name,
+	COUNT(t1.product_id)as total_items
+FROM sales t1
+LEFT JOIN menu t2 ON t1.product_id = t2.product_id
+GROUP BY 1,2
+ORDER BY 3 desc
 ````
 The most purchased item on the menu was ramen, it was purchased 8 times in total
 
