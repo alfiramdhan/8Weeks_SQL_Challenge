@@ -98,13 +98,13 @@ The most purchased item on the menu was ramen, it was purchased 8 times in total
 ````sql
 WITH rank_order AS (
 	SELECT t1.customer_id,
-			product_name,
-			COUNT(t1.product_id)as total_items,
-			ROW_NUMBER () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
-	FROM dannys_dinner.sales t1
-	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+		product_name,
+		COUNT(t1.product_id)as total_items,
+		ROW_NUMBER () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
+	FROM sales t1
+	LEFT JOIN menu t2 ON t1.product_id = t2.product_id
 	GROUP BY 1,2
-	ORDER BY 3 desc
+	ORDER BY 3 DESC
 )
 	
 SELECT customer_id,
