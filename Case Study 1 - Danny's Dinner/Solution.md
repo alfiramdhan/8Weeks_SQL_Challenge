@@ -161,7 +161,7 @@ WITH rank_order AS (
 	
 SELECT customer_id,
 	product_name,
-	rn
+	order_date as purchase_after_member
 FROM rank_order
 WHERE rn=1
 ORDER BY 1;
