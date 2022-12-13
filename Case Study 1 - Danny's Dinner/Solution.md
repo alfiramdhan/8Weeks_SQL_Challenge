@@ -146,22 +146,25 @@ Another way to he first item purchased, we can use window function `rank()` to r
 After we have those ranks, we can select the rows with the rank = 1.
 
 ````sql
-with index_rank as(
-	select mm.customer_id,
-			order_date,
-			s.product_id,
-			row_number() over(partition by mm.customer_id order by order_date)as ranking
-	from sales s, members mm
-	where s.customer_id = mm.customer_id
-		and s.order_date>mm.join_date)
+WITH rank_order AS (
+	SELECT t1.customer_id,
+		product_name,
+		t1.order_date,
+		ROW_NUMBER () OVER(PARTITION BY t1.customer_id order by order_date)as rn
+	FROM dannys_dinner.sales t1
+	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+	LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
+	WHERE t1.order_date >= t3.join_date
+	GROUP BY 1,2,3
+	ORDER BY 1
+)
 	
-select customer_id,
-		order_date,
-		product_name
-from index_rank id, menu mn
-where id.product_id = mn.product_id
-	and ranking = 1
-order by 1;
+SELECT customer_id,
+	product_name,
+	rn
+FROM rank_order
+WHERE rn=1
+ORDER BY 1;
 ````
 
 #### 7. Which item was purchased just before the customer became a member?
