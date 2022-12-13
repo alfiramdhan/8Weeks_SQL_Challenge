@@ -172,15 +172,15 @@ ORDER BY 1;
 Customer A purchased their membership on January, 7 - and they placed an order that day. We do not have time and therefore can not say exactly if this purchase was made before of after they became a member. Let's consider that if the purchase date matches the membership date, then the purchase made on this date, was the first customer's purchase as a member. It means that we need to exclude this date in the `WHERE` statement.
 
 ````sql
-select s.customer_id,
-	s.order_date as date_before_member,
-	mn.product_id,
-	mn.product_name
-from sales s, members ms, menu mn
-where s.customer_id = ms.customer_id
-	and s.product_id = mn.product_id
-	and s.order_date < ms.join_date
-order by 1,2;
+SELECT t1.customer_id,
+		product_name,
+		t1.order_date as date_before_member,
+		ROW_NUMBER () OVER(PARTITION BY t1.customer_id order by order_date)as rn
+FROM dannys_dinner.sales t1
+LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
+WHERE t1.order_date < t3.join_date
+ORDER BY 1,2;
 ````
 
 #### 8. What is the total items and amount spent for each member before they became a member?
