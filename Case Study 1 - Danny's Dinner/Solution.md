@@ -226,5 +226,31 @@ WITH spent AS (
 ````
 
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
-
-
+````sql
+WITH count_points AS (
+    SELECT t1.customer_id,
+		order_date,
+		join_date,
+		product_name,
+		SUM(point) AS point
+    FROM dannys_dinner.sales t1	
+    JOIN (SELECT  product_id,
+			 product_name,
+		CASE WHEN product_name = 'sushi' THEN price * 20
+			ELSE price * 10
+		END AS point
+		FROM dannys_dinner.menu AS m
+	         ) AS t2 ON t1.product_id = t2.product_id
+    JOIN dannys_dinner.members AS t3 ON t1.customer_id = t3.customer_id
+    GROUP BY 1,2,3,4
+  )
+	SELECT customer_id,
+		  SUM(CASE WHEN order_date >= join_date
+				  AND order_date < join_date + (7 * INTERVAL '1 day')
+				  AND product_name != 'sushi' THEN point * 2
+				  ELSE point END) AS new_points
+	FROM count_points
+	WHERE  DATE_PART('month', order_date) = 1
+	GROUP BY 1
+	ORDER BY 1;
+````
