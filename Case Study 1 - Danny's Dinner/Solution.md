@@ -204,15 +204,18 @@ order by 1,2;
 
 ````sql
 WITH spent AS (
-	SELECT customer_id,
+	SELECT t1.customer_id,
 		product_name,
+		order_date,
 		SUM(price)as total_spent,
 		CASE WHEN product_name = 'sushi' THEN 20
 			ELSE 10
 		END as points
 	FROM dannys_dinner.sales t1
 	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
-	GROUP BY 1,2
+	LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
+	WHERE order_date >= join_date
+	GROUP BY 1, 2, 3
 	ORDER BY 1
 )
 	SELECT customer_id,
