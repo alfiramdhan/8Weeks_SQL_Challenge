@@ -203,22 +203,23 @@ order by 1,2;
 #### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
 ````sql
-with total_points as(
-	select customer_id,
-		product_id,
-		sum(price)as total_spent,
-		case when m.product_name = 'sushi' THEN 20
-		else 10 end as points
-	from sales s, menu m
-	where s.product_id = m.product_id
-	group by 1,2
-	order by 1
+WITH spent AS (
+	SELECT customer_id,
+		product_name,
+		SUM(price)as total_spent,
+		CASE WHEN product_name = 'sushi' THEN 20
+			ELSE 10
+		END as points
+	FROM dannys_dinner.sales t1
+	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+	GROUP BY 1,2
+	ORDER BY 1
 )
-		select customer_id,
-			sum(total_spent*points)as customer_points
-		from total_points		
-		group by 1
-		order by 1;
+	SELECT customer_id,
+		SUM(total_spent * points)as total_points
+	FROM spent
+	GROUP BY 1
+	ORDER BY 1;
 ````
 
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
