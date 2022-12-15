@@ -2,7 +2,14 @@
 
 ## Problem Statement
 
-Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. Having this deeper connection with his customers will help him deliver a better and more personalised experience for his loyal customers. 
+Danny wants to use the data to answer a few simple questions about :
+
+1. How is customer visiting pattern ?
+2. How much money customers have spent and also which menu items are their
+Favourite ?
+3. Expansion of existing customer loyalty program
+4. Join all tables and about the ranking of customer products so Danny and his
+team can quickly derive insights
 
 Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/case-study-1/)
 
