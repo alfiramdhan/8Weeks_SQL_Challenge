@@ -17,8 +17,8 @@ Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/
 ````sql
 select s.customer_id,
 		sum(m.price)as total_spent
-from sales s
-join menu m on s.product_id = m.product_id
+from dannys_dinner.sales s
+join dannys_dinnermenu m on s.product_id = m.product_id
 group by customer_id 
 order by customer_id;
 ````
@@ -28,7 +28,7 @@ order by customer_id;
 ````sql
 select customer_id,
 	count(order_date)as number_days_visit
-from sales	
+from dannys_dinner.sales	
 group by 1
 order by customer_id;
 ````
@@ -40,14 +40,14 @@ After we have 'first_date', we can select product_name to find first item purcha
 
 ````sql
 select s1.customer_id, s2.first_date, s1.product_id, m.product_name
-from sales s1
+from dannys_dinner.sales s1
 join (
 	select ss.customer_id,
 			min(ss.order_date)as first_date
-	from sales ss
+	from dannys_dinner.sales ss
 	group by 1
 )s2 on s1.customer_id = s2.customer_id
-join menu m on s1.product_id = m.product_id	
+join dannys_dinner.menu m on s1.product_id = m.product_id	
 WHERE s1.order_date = s2.first_date	
 order by 1;
 ````
@@ -61,7 +61,7 @@ with index_rank as(
 		order_date,
 		product_id,
 		row_number() over(partition by customer_id order by order_date)as rnk
-	from sales)
+	from dannys_dinner.sales)
 	
 select customer_id,
 	order_date,
@@ -85,8 +85,8 @@ The first (and the only) purchase for customer C was ramen
 SELECT t1.product_id,
 	product_name,
 	COUNT(t1.product_id)as total_items
-FROM sales t1
-LEFT JOIN menu t2 ON t1.product_id = t2.product_id
+FROM dannys_dinner.sales t1
+LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
 GROUP BY 1,2
 ORDER BY 3 desc
 ````
@@ -101,7 +101,7 @@ WITH rank_order AS (
 		product_name,
 		COUNT(t1.product_id)as total_items,
 		ROW_NUMBER () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
-	FROM sales t1
+	FROM dannys_dinner.sales t1
 	LEFT JOIN menu t2 ON t1.product_id = t2.product_id
 	GROUP BY 1,2
 	ORDER BY 3 DESC
@@ -131,13 +131,13 @@ select s1.customer_id, s1.first_date, s2.product_id, m.product_name
 from (
 	select ss.customer_id,
 			min(ss.order_date)as first_date
-	from members mm
-	join sales ss on mm.customer_id = ss.customer_id
+	from dannys_dinner.members mm
+	join dannys_dinner.sales ss on mm.customer_id = ss.customer_id
 	where ss.order_date > mm.join_date
 	group by 1
 )s1
-left join sales s2	on s1.customer_id = s2.customer_id
-join menu m on s2.product_id = m.product_id	
+left join dannys_dinner.sales s2 on s1.customer_id = s2.customer_id
+join dannys_dinner.menu m on s2.product_id = m.product_id	
 WHERE s2.order_date = s1.first_date	
 order by 1;
 ````
@@ -192,7 +192,7 @@ select s.customer_id,
 	order_date as date_before_member,
 	count(s.product_id)as total_items,
 	sum(price)as total_spent
-from sales s, members ms, menu mn
+from dannys_dinner.sales s, dannys_dinner.members ms, dannys_dinner.menu mn
 where s.customer_id = ms.customer_id
 	and s.product_id = mn.product_id
 	and s.order_date < ms.join_date
