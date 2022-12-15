@@ -254,3 +254,38 @@ WITH count_points AS (
 	GROUP BY 1
 	ORDER BY 1;
 ````
+
+-- Bonus Question
+
+11. Join all the things
+
+````sql
+SELECT t1.customer_id, order_date,
+product_name,
+price,
+CASE WHEN order_date >= join_date THEN 'Y'
+ELSE 'N' END as members
+FROM dannys_dinner.sales t1
+LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id;
+````
+
+12. Rank all the things
+
+````sql
+WITH index_rn AS (
+SELECT t1.customer_id,
+order_date, product_name, price,
+CASE WHEN order_date >= join_date THEN 'Y' ELSE 'N' END as members
+FROM dannys_dinner.sales t1
+LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
+LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id ORDER BY 1
+)
+SELECT customer_id,
+order_date, product_name, price, members,
+CASE WHEN members = 'N' THEN null
+ELSE RANK () OVER (PARTITION BY customer_id,members ORDER BY order_date)
+END as ranking FROM index_rn ;
+````
+
+--
