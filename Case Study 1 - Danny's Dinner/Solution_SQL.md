@@ -235,16 +235,16 @@ OR
 
 ````sql
 SELECT t1.customer_id,
-		SUM(point)as total_point
+	SUM(point)as total_point
 FROM dannys_dinner.sales t1
-	JOIN (
-			SELECT product_id,
-					product_name,
-					CASE WHEN product_name = 'sushi' THEN price * 20
-						ELSE price * 10
-					END as point
-			FROM dannys_dinner.menu) t2 ON t1.product_id = t2.product_id
-	JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
+JOIN (
+	SELECT product_id,
+		product_name,
+		CASE WHEN product_name = 'sushi' THEN price * 20
+			ELSE price * 10
+		END as point
+	FROM dannys_dinner.menu) t2 ON t1.product_id = t2.product_id
+JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
 WHERE order_date >= join_date	
 GROUP BY 1
 ORDER BY 1;
