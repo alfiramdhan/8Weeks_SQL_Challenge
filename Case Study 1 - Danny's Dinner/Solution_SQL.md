@@ -229,6 +229,9 @@ ORDER BY 1;
 ````
 
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+First Step : calculate the total points for each customer as in number 9
+
 ````sql
 WITH count_point AS(
 	SELECT t1.customer_id,
@@ -247,6 +250,10 @@ WITH count_point AS(
 	JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
 	GROUP BY 1,2,3,4
 )
+````
+Once we get total_point, then we can get total points for each customer at the end of January
+Since the hint is end of January so we can use CASE WHEN function and Interval function to retrieve data
+````
 	SELECT customer_id,
 			SUM(CASE WHEN order_date >= join_date 
 			   		AND order_date < join_date + (7*INTERVAL '1 day')
