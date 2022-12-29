@@ -209,29 +209,7 @@ order by 1,2;
 
 #### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
-````sql
-WITH spent AS (
-	SELECT t1.customer_id,
-		product_name,
-		order_date,
-		SUM(price)as total_spent,
-		CASE WHEN product_name = 'sushi' THEN 20
-			ELSE 10
-		END as points
-	FROM dannys_dinner.sales t1
-	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
-	LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
-	WHERE order_date >= join_date
-	GROUP BY 1, 2, 3
-	ORDER BY 1
-)
-	SELECT customer_id,
-		SUM(total_spent * points)as total_points
-	FROM spent
-	GROUP BY 1
-	ORDER BY 1;
-````
-OR
+Since points value only for members so we need to specify for each customer after became a member
 
 ````sql
 SELECT t1.customer_id,
