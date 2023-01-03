@@ -253,6 +253,7 @@ WITH count_point AS(
 ````
 Once we get total_point, then we can get total points for each customer at the end of January
 Since the hint is end of January so we can use CASE WHEN function and Interval function to retrieve data
+
 ````
 	SELECT customer_id,
 			SUM(CASE WHEN order_date >= join_date 
