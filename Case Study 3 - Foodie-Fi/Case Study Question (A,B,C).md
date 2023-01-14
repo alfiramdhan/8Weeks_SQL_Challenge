@@ -241,3 +241,54 @@ WITH lead_plan AS(
 ```
 ---
 
+## C. Challenge Payment Question
+We need to create  a new payments table for the year 2020 that includes : customer_id, plan_id, plan_name, payment_date, amount, payment_order
+
+First Step, make sure first plan for each customer was plan_id = 0 or trial plan
+
+```SQL
+with index_rank as(	
+	select customer_id,
+			start_date,
+			plan_id,
+			row_number() over(partition by customer_id order by start_date)as rn
+	from foodie_fi.subscriptions)
+	
+	select customer_id,
+			start_date,
+			plan_id
+	from index_rank
+	where rn = 1
+		and plan_id != 0
+```
+Then create cte USING lag() function to get new column
+```
+with lag_table AS(
+	select customer_id,
+			lag(t1.plan_id,1) over(partition by customer_id order by start_date)as last_plan,
+			t1.plan_id as new_plan,
+			plan_name,
+			lag(start_date,1) over(partition by customer_id order by start_date)as start_date,
+			start_date as payment_date,
+			lag(numeric,1) over(partition by customer_id order by start_date)as last_amount,
+			numeric as amount
+	from foodie_fi.subscriptions t1
+	join foodie_fi.plans t2 ON t1.plan_id = t2.plan_id
+	where extract(year from start_date) = 2020
+)
+
+	select customer_id,
+			new_plan as plan_id,
+			plan_name,
+			payment_date,
+			case when last_plan = 1 and new_plan = 2 then amount - last_amount
+				when last_plan = 1 and new_plan = 3 then amount - last_amount 
+				else amount end as total_amount,
+			row_number() over(partition by customer_id order by payment_date)as payment_order	
+	from lag_table
+	where last_plan is not null
+		and new_plan != 4
+	order by customer_id;
+```
+
+--
