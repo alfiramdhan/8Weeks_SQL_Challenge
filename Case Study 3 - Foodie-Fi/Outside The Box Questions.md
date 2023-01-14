@@ -4,7 +4,7 @@
 
 Q1. How would you calculate the rate of growth for Foodie-Fi?
 
-I calculated the distribution of new customers, churn rate, and month-to-month retention rate to derive foodie-fi customer growth
+I calculated the distribution of new customers, churn rate, and retention rate to derive foodie-fi customer growth
 
 Q2. What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?
 
