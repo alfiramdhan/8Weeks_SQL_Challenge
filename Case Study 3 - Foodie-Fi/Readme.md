@@ -38,4 +38,4 @@ There are 5 customer plans.
 ![alt text](https://github.com/manaswikamila05/8-Week-SQL-Challenge/blob/main/Case%20Study%20%23%203%20-%20Foodie-Fi/ERD.jpg)
 
 ## Case Study Solutions
-- [A, B, C](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%203%20-%20Foodie-Fi/Case%20Study%20Question%20(A%2CB%2CC).md)
+- [A, B, C](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%203%20-%20Foodie-Fi/Case%20Study%20Solution%20(A,B,C).md)
