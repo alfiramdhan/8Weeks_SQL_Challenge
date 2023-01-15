@@ -30,17 +30,17 @@ This case study is all about calculating metrics, growth and helping the busines
 ## Datasets used
 Just like popular cryptocurrency platforms - Data Bank is also run off a network of nodes where both money and data is stored across the globe. In a traditional banking sense - you can think of these nodes as bank branches or stores that exist around the world. The  regions table contains the region_id and their respective region_name values.
   
-![image](https://user-images.githubusercontent.com/77529445/165747951-d00563e9-86cb-404b-913e-1df4c26f6029.png)
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/regions.png)
 
 Customers are randomly distributed across the nodes according to their region - this also specifies exactly which node contains both their cash and data.
 This random distribution changes frequently to reduce the risk of hackers getting into Data Bank’s system and stealing customer’s money and data!
   
 Below is a sample of the top 10 rows of the data_bank.customer_nodes
-![image](https://user-images.githubusercontent.com/77529445/165748069-0ccca2f4-fc9c-4183-8cda-6e10a9ee782b.png)
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/customer_nodes.png)
 
 Customer transaction table stores all customer deposits, withdrawals and purchases made using their Data Bank debit card
   
-![image](https://user-images.githubusercontent.com/77529445/165748268-c7e71778-173b-435d-93a4-178c6a2d1ebc.png)
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/customer_transactions.png)
 
  
 ## Entity Relationship Diagram
