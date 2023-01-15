@@ -1,4 +1,4 @@
-## Create Table
+## Create Schema and Table
 
 Danny has shared the data design for Foodie-Fi and also short descriptions on each of the database tables - our case study focuses on only 2 tables but there will be a challenge to create a new table for the Foodie-Fi team.
 
