@@ -40,8 +40,26 @@ FROM historical_deposit;
 
 
 ### 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
-
-
+```SQL
+with cte_txn_type as(
+	SELECT extract(month from txn_date)as months,
+			TO_CHAR(txn_date, 'Month') AS month,
+			customer_id,
+			sum(case when txn_type = 'deposit' then 1 else 0 end)as number_deposit,
+			sum(case when txn_type = 'purchase' then 1 else 0 end)as number_purchase,
+			sum(case when txn_type = 'withdrawal' then 1 else 0 end)as number_withdraw
+	FROM data_bank.customer_transactions
+	GROUP BY 1,2,3
+	order by 1,2,3
+)
+	select month,
+			count(customer_id)as number_customer
+	from cte_txn_type
+	where number_deposit > 1 and (number_purchase = 1 or number_withdraw = 1)
+	group by months, month
+	order by months;
+```
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%203.png)
 
 ### 4. What is the closing balance for each customer at the end of the month?
 
