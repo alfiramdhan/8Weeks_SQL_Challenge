@@ -77,7 +77,7 @@ with txn_monthly_balance as(
 	group by 1,2,3
 	order by 1
 )
--- Once we got nominal_amount then we can closing_balance column using `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` in `over` clause
+-- Once we got nominal_amount then we can create closing_balance column using `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` in `over` clause
 
 	select customer_id,
 			months,
