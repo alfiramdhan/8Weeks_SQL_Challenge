@@ -66,25 +66,46 @@ with cte_txn_type as(
 Closing bank balance is the nominal amount of debit or credit in bank account at the end of the period.
 If txn_type = deposito then nominal_amount becomes positive
 else txn_type = purchase or withdraw then ominal_amount becomes negative
-```sql
-with txn_monthly_balance as(
-	select customer_id,
-			txn_amount,
-			extract(month from txn_date)as months,
-			sum(case when txn_type = 'deposit' then txn_amount
-			   		else -txn_amount end)as nominal_amount
-	from data_bank.customer_transactions
-	group by 1,2,3
-	order by 1
-)
--- Once we got nominal_amount then we can create closing_balance column using `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` in `over` clause
+```SQL
+-- Getting end of month balance
+-- first step : to generate end of the month we need to retrieve month from txn_date then add interval 1 month so we get first day of the month
+-- then reduced 1 day to get day at end of the month
+-- criteria + = deposito then - = purchase and withdraw
 
-	select customer_id,
-			months,
-			nominal_amount,
-			sum(nominal_amount) over (partition by customer_id
-						order by months ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)AS closing_balance
-	from txn_monthly_balance;
+WITH monthly_balances AS (
+  SELECT 
+    customer_id, 
+    (DATE_TRUNC('month', txn_date) + INTERVAL '1 MONTH - 1 DAY') AS closing_month, 
+    txn_type, 
+    txn_amount,
+    SUM(CASE WHEN txn_type = 'withdrawal' OR txn_type = 'purchase' THEN (-txn_amount)
+      ELSE txn_amount END) AS transaction_balance
+  FROM data_bank.customer_transactions
+  GROUP BY customer_id, txn_date, txn_type, txn_amount
+	order by 1,2
+),
+-- Since the data is available for 4 months
+-- We can generate a series of 4 months using generate_series(0,3)
+
+last_day AS (
+  SELECT
+    DISTINCT customer_id,
+    ('2020-01-31'::DATE + GENERATE_SERIES(0,3) * INTERVAL '1 MONTH') AS ending_month
+  FROM data_bank.customer_transactions
+)
+
+-- we need to assume that if the transaction_balance is null, it is zero. Then we can use the COALESCE function
+
+  SELECT 
+    ld.customer_id, ld.ending_month, 
+    COALESCE(mb.transaction_balance, 0) AS monthly_change,
+    SUM(mb.transaction_balance) OVER 
+      (PARTITION BY ld.customer_id ORDER BY ld.ending_month
+      ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS closing_balance
+  FROM last_day ld
+  LEFT JOIN monthly_balances mb
+    ON ld.ending_month = mb.closing_month
+    AND ld.customer_id = mb.customer_id;
 ```
 ![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%204.png)
 
