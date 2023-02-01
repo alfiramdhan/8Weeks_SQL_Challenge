@@ -18,7 +18,7 @@ FROM data_bank.customer_transactions
 GROUP BY 1
 ORDER BY 1;
 ```
-![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/regions.png)
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%201.png)
 
 ### 2. What is the average total historical deposit counts and amounts for all customers?
 
