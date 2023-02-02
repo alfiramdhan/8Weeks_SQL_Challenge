@@ -126,7 +126,7 @@ next_rank AS(
 	FROM next_rank
 	WHERE next_ranking IS NULL;
 ```
-![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%204.png
+![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%204.png)
 
 
 ### 5. What is the percentage of customers who increase their closing balance by more than 5%?
