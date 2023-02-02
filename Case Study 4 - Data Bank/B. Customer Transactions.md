@@ -62,42 +62,35 @@ with cte_txn_type as(
 ![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%203.png)
 
 ### 4. What is the closing balance for each customer at the end of the month?
-
-Closing bank balance is the nominal amount of debit or credit in bank account at the end of the period.
-If txn_type = deposito then nominal_amount becomes positive
-else txn_type = purchase or withdraw then ominal_amount becomes negative
 ```SQL
--- Getting end of month balance
--- first step : to generate end of the month we need to retrieve month from txn_date then add interval 1 month so we get first day of the month
--- then reduced 1 day to get day at end of the month
--- criteria + = deposito then - = purchase and withdraw
+-- CTE 1 - To identify transaction amount as an inflow (+) or outflow (-)
+-- - Then generate last day or end of the month date_trunc() then add interval 1 month minus day to get last day at end of the month
 
-WITH monthly_balances AS (
-  SELECT 
-    customer_id, 
-    (DATE_TRUNC('month', txn_date) + INTERVAL '1 MONTH - 1 DAY') AS closing_month, 
-    txn_type, 
-    txn_amount,
-    SUM(CASE WHEN txn_type = 'withdrawal' OR txn_type = 'purchase' THEN (-txn_amount)
-      ELSE txn_amount END) AS transaction_balance
-  FROM data_bank.customer_transactions
-  GROUP BY customer_id, txn_date, txn_type, txn_amount
-	order by 1,2
+WITH monthly_balances AS(
+	SELECT customer_id,
+			(DATE_TRUNC('month', txn_date) + INTERVAL '1 MONTH - 1 DAY')AS closing_month,
+			txn_type,
+			txn_amount,
+			SUM(CASE WHEN txn_type = 'purchase' or txn_type = 'withdrawal' then (-txn_amount)
+				ELSE txn_amount
+			END)AS transaCtion_balance
+	FROM data_bank.customer_transactions
+	GROUP BY customer_id, txn_date, txn_type, txn_amount
+	ORDER BY 1,2
 ),
--- Since the data is available for 4 months
--- We can generate a series of 4 months using generate_series(0,3)
-
-last_day AS (
-  SELECT
+-- CTE 2 - To generate txn_date as a series of last day of month for each customer
+last_day AS(
+	SELECT
     DISTINCT customer_id,
     ('2020-01-31'::DATE + GENERATE_SERIES(0,3) * INTERVAL '1 MONTH') AS ending_month
   FROM data_bank.customer_transactions
-)
-
+),
+-- CTE 3 - Create closing balance for each month using Window function SUM() to add changes during the month
 -- we need to assume that if the transaction_balance is null, it is zero. Then we can use the COALESCE function
-
-  SELECT 
-    ld.customer_id, ld.ending_month, 
+closing_balance AS(
+SELECT 
+    ld.customer_id, 
+    ld.ending_month,
     COALESCE(mb.transaction_balance, 0) AS monthly_change,
     SUM(mb.transaction_balance) OVER 
       (PARTITION BY ld.customer_id ORDER BY ld.ending_month
@@ -105,7 +98,33 @@ last_day AS (
   FROM last_day ld
   LEFT JOIN monthly_balances mb
     ON ld.ending_month = mb.closing_month
-    AND ld.customer_id = mb.customer_id;
+      AND ld.customer_id = mb.customer_id
+),
+-- CTE 4 - Use Window function ROW_NUMBER() to rank transactions within each month
+monthly_ranking AS(
+	SELECT customer_id,
+			ending_month,
+			monthly_change,
+			closing_balance,
+			ROW_NUMBER() OVER(PARTITION BY customer_id, ENDing_MONTH ORDER BY ending_month)as ranking
+	FROM closing_balance		
+),
+-- CTE 5 - Use Window function LEAD() to query value in next row and retrieve NULL for last row
+next_rank AS(
+	SELECT customer_id,
+			ending_month,
+			monthly_change,
+			closing_balance,
+			ranking,
+			LEAD(ranking) OVER(PARTITION BY customer_id, ending_month ORDER BY ending_month)as next_ranking
+	FROM monthly_ranking		
+)
+	SELECT 
+		customer_id, ending_month, 
+		monthly_change, closing_balance,
+		CASE WHEN next_ranking IS NULL THEN ranking END AS criteria
+	FROM next_rank
+	WHERE next_ranking IS NULL;
 ```
 ![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%204.png)
 
