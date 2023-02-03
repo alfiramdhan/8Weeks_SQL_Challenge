@@ -62,6 +62,9 @@ with cte_txn_type as(
 ![image](https://github.com/alfiramdhan/8Weeks_SQL_Challenge/blob/main/Case%20Study%204%20-%20Data%20Bank/4.2%20IMAGE%203.png)
 
 ### 4. What is the closing balance for each customer at the end of the month?
+
+When we want to get closing balance, it means we need to calculate RUNNING TOTAL or total_amount per day. Once get the total_amount, we can use ROWS clause to get the running total. Since creating the closing balance requires different criteria so we have to do it step by step :
+
 ```SQL
 -- CTE 1 - To identify transaction amount as an inflow (+) or outflow (-)
 -- - Then generate last day or end of the month date_trunc() then add interval 1 month minus day to get last day at end of the month
