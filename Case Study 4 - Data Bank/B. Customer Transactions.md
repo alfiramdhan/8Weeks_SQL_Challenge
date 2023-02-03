@@ -63,7 +63,7 @@ with cte_txn_type as(
 
 ### 4. What is the closing balance for each customer at the end of the month?
 
-When we want to get closing balance, it means we need to calculate RUNNING TOTAL or total_amount per day. Once get the total_amount, we can use ROWS clause to get the running total. Since creating the closing balance requires different criteria so we have to do it step by step :
+When we want to get CLOSING BALANCE, it means we need to calculate RUNNING TOTAL or total_amount per day. Once get the total_amount, we can use ROWS clause to get the running total. Since creating the closing balance requires different criteria so we have to do it step by step :
 
 ```SQL
 -- CTE 1 - To identify transaction amount as an inflow (+) or outflow (-)
