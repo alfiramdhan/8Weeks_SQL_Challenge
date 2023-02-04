@@ -104,6 +104,7 @@ closing_balance AS(
 		and ld.ending_month = mb.closing_month
 ),
 -- CTE 4 - Use Window function ROW_NUMBER() to rank transactions within each month
+-- ## This step is optional, if we skip this step we can jump to LEAD function and get final closing balance
 
 transaction_rank AS(
 	SELECT customer_id,
