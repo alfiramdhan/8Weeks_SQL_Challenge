@@ -25,7 +25,7 @@ Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/
 select s.customer_id,
 		sum(m.price)as total_spent
 from dannys_dinner.sales s
-join dannys_dinnermenu m on s.product_id = m.product_id
+join dannys_dinner.menu m on s.product_id = m.product_id
 group by customer_id 
 order by customer_id;
 ````
