@@ -149,63 +149,74 @@ WHERE s2.order_date = s1.first_date
 order by 1;
 ````
 
-Another way to he first item purchased, we can use window function `rank()` to rank the items ordered by each customer in a temporary table using WITH statement.
+Another way to he first item purchased, we can use window function `dense_rank()` to rank the items ordered by each customer in a temporary table using WITH statement.
 After we have those ranks, we can select the rows with the rank = 1.
 
 ````sql
-WITH rank_order AS (
-	SELECT t1.customer_id,
+with ranking AS(
+	SELECT mm.customer_id,
+		order_date,
 		product_name,
-		t1.order_date,
-		ROW_NUMBER () OVER(PARTITION BY t1.customer_id order by order_date)as rn
-	FROM dannys_dinner.sales t1
-	LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
-	LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
-	WHERE t1.order_date >= t3.join_date
-	GROUP BY 1,2,3
-	ORDER BY 1
+		DENSE_RANK() OVER(PARTITION BY mm.customer_id ORDER BY order_date)as rnk
+	FROM dannys_dinner.members mm
+	JOIN dannys_dinner.sales s on mm.customer_id = s.customer_id
+	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
+	WHERE order_date >= join_date
 )
-	
-SELECT customer_id,
-	product_name,
-	order_date as purchase_after_member
-FROM rank_order
-WHERE rn=1
-ORDER BY 1;
+	SELECT customer_id,
+		order_date,
+		product_name
+	FROM ranking
+	WHERE rnk = 1;
 ````
+So, We find that Curry was purchased first by A after they become a member. Then, Sushi was purchased first by B after they become a member
+
 
 #### 7. Which item was purchased just before the customer became a member?
 
 Customer A purchased their membership on January, 7 - and they placed an order that day. We do not have time and therefore can not say exactly if this purchase was made before of after they became a member. Let's consider that if the purchase date matches the membership date, then the purchase made on this date, was the first customer's purchase as a member. It means that we need to exclude this date in the `WHERE` statement.
 
 ````sql
-SELECT t1.customer_id,
-		product_name,
-		t1.order_date as date_before_member,
-		ROW_NUMBER () OVER(PARTITION BY t1.customer_id order by order_date)as rn
-FROM dannys_dinner.sales t1
-LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
-LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
-WHERE t1.order_date < t3.join_date
-ORDER BY 1,2;
+SELECT mm.customer_id,
+	order_date,
+	product_name,
+	DENSE_RANK() OVER(PARTITION BY mm.customer_id ORDER BY order_date DESC)as rnk
+FROM dannys_dinner.members mm
+JOIN dannys_dinner.sales s on mm.customer_id = s.customer_id
+JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
+WHERE order_date < join_date;
 ````
+So, We find that Sushi was purchased by A & B just before they become a member
+
 
 #### 8. What is the total items and amount spent for each member before they became a member?
 
 Let's consider that if the purchase date matches the membership date, then the purchase made on this date, was the first customer's purchase as a member. It means that we need to exclude this date in the `WHERE` statement.
 
 ````sql
-select s.customer_id,
-	order_date as date_before_member,
-	count(s.product_id)as total_items,
-	sum(price)as total_spent
-from dannys_dinner.sales s, dannys_dinner.members ms, dannys_dinner.menu mn
-where s.customer_id = ms.customer_id
-	and s.product_id = mn.product_id
-	and s.order_date < ms.join_date
-group by 1,2
-order by 1,2;
+WITH ranking AS(	
+	SELECT mm.customer_id,
+		order_date,
+		COUNT(mn.product_id)as total_items,
+		SUM(price)as total_amount,
+		DENSE_RANK() OVER(PARTITION BY mm.customer_id ORDER BY order_date DESC)as rnk
+	FROM dannys_dinner.members mm
+	JOIN dannys_dinner.sales s on mm.customer_id = s.customer_id
+	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
+	WHERE order_date < join_date
+	GROUP BY 1,2
+)
+	SELECT customer_id,
+		order_date,
+		total_items,
+		total_amount
+	FROM ranking
+	WHERE rnk = 1;
 ````
+For A, the total items and amount spent before they become a member were 2 and 25
+
+While B, the total items and amount spent before they become a member were 1 and 10
+
 
 #### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
