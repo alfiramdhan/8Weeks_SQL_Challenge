@@ -239,6 +239,26 @@ GROUP BY 1
 ORDER BY 1;
 ````
 
+Or we can use CTE :
+````sql
+WITH total AS(
+	SELECT mm.customer_id,
+		CASE WHEN product_name = 'sushi' THEN sum(price*20)
+			else sum(price*10)
+		END as point
+	FROM dannys_dinner.sales s
+	JOIN dannys_dinner.members mm on s.customer_id = mm.customer_id
+	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
+	WHERE order_date >= join_date
+	GROUP BY mm.customer_id, product_name
+)	
+	SELECT customer_id,
+		SUM(point)as total_point
+	FROM total
+	GROUP BY 1
+	ORDER BY 1;
+````
+
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
 First Step : calculate the total points for each customer as in number 9
