@@ -265,36 +265,40 @@ For A, the total points are 510. Then for B, the total points are 440
 First Step : calculate the total points for each customer as in number 9
 
 ````sql
-WITH count_point AS(
-	SELECT t1.customer_id,
+WITH total AS(
+	SELECT s.customer_id,
 		order_date,
-		join_date,
-		product_name,
+		CASE WHEN product_name = 'sushi' THEN sum(price*20)
+			else sum(price*10)
+		END as point
+	FROM dannys_dinner.sales s
+	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
+	GROUP BY s.customer_id, order_date,product_name
+),
+total_point AS
+	SELECT customer_id,
+		order_date,
 		SUM(point)as total_point
-	FROM dannys_dinner.sales t1
-	JOIN (
-		SELECT product_id,
-			product_name,
-			CASE WHEN product_name = 'sushi' THEN price * 20
-				ELSE price*10
-			END as point
-		FROM dannys_dinner.menu) t2 ON t1.product_id = t2.product_id
-	JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
-	GROUP BY 1,2,3,4
+	FROM total
+	GROUP BY 1,2
+	ORDER BY 1,2
 )
 ````
-Once we get total_point, then we can get total points for each customer at the end of January
+Once we get total_point, then we can get total points for each customer after they become a member
+- txn from 07/01 to 14/01 (7days) for A
+- txn from 09/01 to 16/01 (7days)for B. So we use interval 2 days
 Since the hint is end of January so we can use CASE WHEN function and Interval function to retrieve data
 
 ````
-	SELECT customer_id,
-			SUM(CASE WHEN order_date >= join_date 
-			   		AND order_date < join_date + (7*INTERVAL '1 day')
-			   		   AND product_name != 'sushi' THEN total_point *2
-			   	ELSE total_point
-			   END)as total_new_point
-	FROM count_point
-	WHERE DATE_PART('month', order_date) = 1
+	SELECT mm.customer_id,
+		SUM(CASE WHEN order_date >= join_date 
+				AND order_date < join_date + (7*INTERVAL '2 day')
+				THEN total_point *2
+			else total_point
+		END)as total_new_point
+	FROM total_point t
+	JOIN dannys_dinner.members mm ON t.customer_id = mm.customer_id
+	WHERE DATE_PART('month',order_date) = 1
 	GROUP BY 1
 	ORDER BY 1;
 ````
