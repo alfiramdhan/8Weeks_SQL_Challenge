@@ -303,6 +303,8 @@ Then we need to get total point until the end of January so we can use CASE WHEN
 	GROUP BY 1
 	ORDER BY 1;
 ````
+Hence, we get total point of A at the end of January is 1370 and 1140 for B
+
 
 -- Bonus Question
 
