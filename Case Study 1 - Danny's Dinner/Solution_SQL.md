@@ -287,9 +287,10 @@ total_point AS
 Once we get total_point, then we can get total points for each customer after they become a member
 - txn from 07/01 to 14/01 (7days) for A
 - txn from 09/01 to 16/01 (7days)for B. So we use interval 2 days
-Since the hint is end of January so we can use CASE WHEN function and Interval function to retrieve data
 
-````
+Then we need to get total point until the end of January so we can use CASE WHEN function and Interval function to retrieve data
+
+````sql
 	SELECT mm.customer_id,
 		SUM(CASE WHEN order_date >= join_date 
 				AND order_date < join_date + (7*INTERVAL '2 day')
