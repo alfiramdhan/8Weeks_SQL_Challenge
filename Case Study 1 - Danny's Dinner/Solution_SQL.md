@@ -258,6 +258,7 @@ WITH total AS(
 	GROUP BY 1
 	ORDER BY 1;
 ````
+For A, the total points are 510. Then for B, the total points are 440
 
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
