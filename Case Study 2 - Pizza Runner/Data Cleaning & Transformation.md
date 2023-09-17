@@ -9,7 +9,7 @@ Looking at the customer_orders table, we can see that there are
 - In the `extras` column, there are missing/ blank spaces ' ' and 'null' values.
 
 In this project, we need to perform data analysis or generate reports, it's often beneficial to keep null values intact. Null values can be easily filtered or aggregated, providing more accurate results.
-- Create a temporary table with all the columns
+- Create a temporary table with all the columns to manipulate the data
 - Replace `blank spaces ' ' and 'null'` values in exlusions and extras columns with null values.
 
 ```sql
