@@ -1,24 +1,6 @@
-## Introduction
-
-Danny was sold on the idea, but he knew that pizza alone was not going to help him get seed funding to expand his new Pizza Empire - so he had one more genius idea to combine with it - he was going to Uberize it - and so Pizza Runner was launched!
-
-Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runner Headquarters (otherwise known as Danny’s house) and also maxed out his credit card to pay freelance developers to build a mobile app to accept orders from customers.
-
-Before you start writing your SQL queries however - you might want to investigate the data, you may want to do something with some of those null values and data types in the customer_orders and runner_orders tables!
-
 Full description: [Case Study #2 - Pizza Runner ](https://8weeksqlchallenge.com/case-study-2/)
 
-
-## Case Study Questions
-
-This case study has LOTS of questions - they are broken up by area of focus including:
-
-- Pizza Metrics
-- Runner and Customer Experience
-- Ingredient Optimisation
-- Pricing and Ratings
-- Bonus DML Challenges (DML = Data Manipulation Language)
-
+# Data Preparation
 
 ## Create Table
 
@@ -139,11 +121,11 @@ VALUES
   (11, 'Tomatoes'),
   (12, 'Tomato Sauce');
 ```  
+----
 
+## Data Cleaning
 
-
-## BEFORE ANSWERING THE QUESTIONS, LET'S BEGIN BY FIXING THE TABLES
-Fixing Customer_Orders Table
+### Fixing Customer_Orders Table
 
 ```sql
 DROP TABLE IF EXISTS customer_orders_cleaned
@@ -173,9 +155,10 @@ CREATE TEMP TABLE customer_orders_cleaned AS WITH first_layer AS(
           extras,
           order_time
     FROM first_layer ;
-```    
+```
+----   
 
-Fixing runner_orders table
+### Fixing runner_orders table
 ```sql
   DROP TABLE IF EXISTS runner_orders_cleaned;
     CREATE TEMP TABLE runner_orders_cleaned AS WITH first_layer AS (
