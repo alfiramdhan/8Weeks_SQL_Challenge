@@ -1,16 +1,5 @@
 # Case Study 1 - Danny's Diner :rice:
 
-## Problem Statement
-
-Danny wants to use the data to answer a few simple questions about :
-
-1. How is customer visiting pattern ?
-2. How much money customers have spent and also which menu items are their
-Favourite ?
-3. Expansion of existing customer loyalty program
-4. Join all tables and about the ranking of customer products so Danny and his
-team can quickly derive insights
-
 Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/case-study-1/)
 
 ## Entity Relationaship Diagram
@@ -23,12 +12,21 @@ Full description: [Case Study #1 - Danny's Diner](https://8weeksqlchallenge.com/
 
 ````sql
 select s.customer_id,
-		sum(m.price)as total_spent
+	sum(m.price)as total_spent
 from dannys_dinner.sales s
 join dannys_dinner.menu m on s.product_id = m.product_id
 group by customer_id 
 order by customer_id;
 ````
+#### Steps :
+- Use `JOIN` to merge sales and menu table as customer_id and price columns are from both table
+- Use `SUM()` and `GROUP BY` to find out the total amount for each customers
+
+#### Answer :
+- Total amount spent for customer A is $76
+- Total amount spent for customer B is $74
+- Total amount spent for customer C is $36
+----
 
 #### 2. How many days has each customer visited the restaurant?
 
@@ -40,11 +38,19 @@ group by 1
 order by customer_id;
 ````
 
+#### Steps :
+- Use `COUNT()` and `DISTINCT` to find out total visit for each customers
+- If we do not use DISTINCT, the number of days may be repeated
+
+#### Answer :
+- Customer A visited 4 times
+- Customer B visited 6 times
+- Customer C visited 2 times
+----
+
 #### 3. What was the first item from the menu purchased by each customer?
 
-To get the first item purchased, we can find the 'first_date' ordered by each customer in subquery `JOIN`
-After we have 'first_date', we can select product_name to find first item purchased by each customer
-
+#### Option 1
 ````sql
 select s1.customer_id, s2.first_date, s1.product_id, m.product_name
 from dannys_dinner.sales s1
@@ -59,32 +65,38 @@ WHERE s1.order_date = s2.first_date
 order by 1;
 ````
 
-Another way to he first item purchased, we can use window function `rank()` to rank the items ordered by each customer in a temporary table using WITH statement.
-After we have those ranks, we can select the rows with the rank = 1.
+#### Steps :
+- Use `JOIN` and `MIN()` in subquery to get the first item purchased for each customer
+- Use the `WHERE` clause to filter on the `order_date = first_date` condition
 
+#### Option 2
 ````sql
 with index_rank as(
 	select customer_id,
 		order_date,
 		product_id,
-		row_number() over(partition by customer_id order by order_date)as rnk
-	from dannys_dinner.sales)
-	
+		dense_rank() over(partition by customer_id order by order_date)as rnk
+	from dannys_dinner.sales
+)	
 select customer_id,
 	order_date,
 	product_name
-from index_rank id, menu mn
-where id.product_id = mn.product_id
-  and rnk = 1
+from index_rank id
+join dannys_dinner.menu mn on id.product_id = mn.product_id
+where rnk = 1
 order by 1;		
 ````
 
-The first purchase for customer A was sushi
+#### Steps :
+- Use `CTE` to create temporary table
+- Use window function `dense_rank()` to rank the items ordered by each customer in a temporary table
+- After we have those ranks, we can use `WHERE` clause to select the rows with the rank = 1.
 
-The first purchase for customer B was curry
-
-The first (and the only) purchase for customer C was ramen
-
+#### Answer :
+- Customer A's first purchases were sushi and curry
+- Customer B's first purchases was curry
+- Customer C's first purchases was ramen
+----
 
 #### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
@@ -95,10 +107,16 @@ SELECT t1.product_id,
 FROM dannys_dinner.sales t1
 LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
 GROUP BY 1,2
-ORDER BY 3 desc
+ORDER BY 3 DESC;
 ````
-The most purchased item on the menu was ramen, it was purchased 8 times in total
 
+#### Steps :
+- Use `COUNT()` and `GROUP BY` to find out number of order for each menu
+- Use `ORDER BY` and `DESCENDING` to get the most purchase item by all customers
+
+#### Answer :
+- The most purchased item on the menu was ramen, it was purchased 8 times in total
+----
 
 #### 5. Which item was the most popular for each customer?
 
@@ -107,9 +125,9 @@ WITH rank_order AS (
 	SELECT t1.customer_id,
 		product_name,
 		COUNT(t1.product_id)as total_items,
-		ROW_NUMBER () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
+		DENSE_RANK () OVER(PARTITION BY t1.customer_id ORDER BY COUNT(t1.product_id) desc )as rn
 	FROM dannys_dinner.sales t1
-	LEFT JOIN menu t2 ON t1.product_id = t2.product_id
+	JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
 	GROUP BY 1,2
 	ORDER BY 3 DESC
 )
@@ -122,35 +140,16 @@ FROM rank_order
 WHERE rn=1
 ORDER BY 1;
 ````
-The most popular item for customer A was ramen, they purchased it 3 times
+#### Steps :
+- Create a `CTE` and use `DENSE_RANK()` to rank number of order for each menu for each customer
+- Use the `WHERE` clause to filter table by rank = 1 to show 1st item purchased by each customer
 
-The most popular item for customer B was curry, ramen and sushi, they purchased each dish 2 times
-
-The most popular item for customer C was ramen, they purchased it 3 times
-
+#### Answer :
+- The most popular item for customer A and C was ramen, they purchased it 3 times
+- Meanwhile, Customer B enjoys all items on the menu.
+----
 
 #### 6. Which item was purchased first by the customer after they became a member?
-
-Let's consider that if the purchase date matches the membership date, then the purchase made on this date, was the first customer's purchase as a member. It means that we need to include this date in the `WHERE` statement.
-
-````sql
-select s1.customer_id, s1.first_date, s2.product_id, m.product_name
-from (
-	select ss.customer_id,
-			min(ss.order_date)as first_date
-	from dannys_dinner.members mm
-	join dannys_dinner.sales ss on mm.customer_id = ss.customer_id
-	where ss.order_date > mm.join_date
-	group by 1
-)s1
-left join dannys_dinner.sales s2 on s1.customer_id = s2.customer_id
-join dannys_dinner.menu m on s2.product_id = m.product_id	
-WHERE s2.order_date = s1.first_date	
-order by 1;
-````
-
-Another way to he first item purchased, we can use window function `dense_rank()` to rank the items ordered by each customer in a temporary table using WITH statement.
-After we have those ranks, we can select the rows with the rank = 1.
 
 ````sql
 with ranking AS(
@@ -169,8 +168,15 @@ with ranking AS(
 	FROM ranking
 	WHERE rnk = 1;
 ````
-So, We find that Curry was purchased first by A after they become a member. Then, Sushi was purchased first by B after they become a member
+#### Steps :
+- Create a `CTE` and use `DENSE_RANK()` to rank purchased items by partitioning `customer_id` and ordering in ascending `order_date`
+- Use the `WHERE` clause to filter purchases after a customer becomes a member
+- Use the `WHERE` clause to filter table by rank = 1 to show 1st item purchased by each customer
 
+#### Answer :
+- Customer A's first order as member is curry
+- Customer B's first order as member is sushi
+----
 
 #### 7. Which item was purchased just before the customer became a member?
 
@@ -186,129 +192,128 @@ JOIN dannys_dinner.sales s on mm.customer_id = s.customer_id
 JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
 WHERE order_date < join_date;
 ````
-So, We find that Sushi was purchased by A & B just before they become a member
+#### Steps :
+- Create a `CTE` and use `DENSE_RANK()` to rank purchased items by partitioning `customer_id` and ordering in descending `order_date`
+- Use the `WHERE` clause to filter purchases before a customer becomes a member
+- Use the `WHERE` clause to filter table by rank = 1 to show 1st item purchased by each customer
 
+#### Answer :
+- Customer A's last order before becoming a member was sushi and curry
+- Meanwhile, Customer B's last order before becoming a member was sushi
+----
 
 #### 8. What is the total items and amount spent for each member before they became a member?
 
 Let's consider that if the purchase date matches the membership date, then the purchase made on this date, was the first customer's purchase as a member. It means that we need to exclude this date in the `WHERE` statement.
 
 ````sql
-WITH ranking AS(	
+WITH total AS(	
 	SELECT mm.customer_id,
 		order_date,
 		COUNT(mn.product_id)as total_items,
-		SUM(price)as total_amount,
-		DENSE_RANK() OVER(PARTITION BY mm.customer_id ORDER BY order_date DESC)as rnk
+		SUM(price)as total_amount
 	FROM dannys_dinner.members mm
 	JOIN dannys_dinner.sales s on mm.customer_id = s.customer_id
 	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
 	WHERE order_date < join_date
 	GROUP BY 1,2
+	ORDER BY 1,2
 )
 	SELECT customer_id,
-		order_date,
-		total_items,
-		total_amount
-	FROM ranking
-	WHERE rnk = 1;
+		SUM(total_items)as total_items,
+		SUM(total_amount)as total_amount
+	FROM total
+	GROUP BY 1;
 ````
-For A, the total items and amount spent before they become a member were 2 and 25
+#### Steps :
+- Create a `CTE` and use `COUNT(), SUM()` to calculate total items and total amount
+- Use the `JOIN` clause to merge members, sales and menu table as customer_id , product_id and price columns are from those table
+- Use the `WHERE` clause to filter purchases before a customer becomes a member
 
-While B, the total items and amount spent before they become a member were 1 and 10
-
+#### Answer :
+Before becoming members,
+- Customer A spent $ 25 on 2 items.
+- Customer B spent $ 40 on 3 items.
+----
 
 #### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
-Since points value only for members so we need to specify for each customer after became a member
-
-````sql
-SELECT t1.customer_id,
-	SUM(point)as total_point
-FROM dannys_dinner.sales t1
-JOIN (
-	SELECT product_id,
-		product_name,
-		CASE WHEN product_name = 'sushi' THEN price * 20
-			ELSE price * 10
-		END as point
-	FROM dannys_dinner.menu) t2 ON t1.product_id = t2.product_id
-JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id
-WHERE order_date >= join_date	
-GROUP BY 1
-ORDER BY 1;
-````
-
-Or we can use CTE :
 ````sql
 WITH total AS(
-	SELECT mm.customer_id,
-		CASE WHEN product_name = 'sushi' THEN sum(price*20)
-			else sum(price*10)
+	SELECT *,
+		CASE WHEN product_id = 1 THEN price * 20
+			else price * 10
 		END as point
-	FROM dannys_dinner.sales s
-	JOIN dannys_dinner.members mm on s.customer_id = mm.customer_id
-	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
-	WHERE order_date >= join_date
-	GROUP BY mm.customer_id, product_name
+	FROM dannys_dinner.menu
 )	
-	SELECT customer_id,
+	SELECT s.customer_id,
 		SUM(point)as total_point
-	FROM total
+	FROM total t
+	JOIN dannys_dinner.sales s on t.product_id = s.product_id
 	GROUP BY 1
 	ORDER BY 1;
 ````
-For A, the total points are 510. Then for B, the total points are 440
+#### Steps :
+Let’s breakdown the question.
+- Each $1 spent = 10 points.
+- But, sushi (product_id = 1) gets 2x points, meaning each $1 spent = 20 points So, we use `CASE WHEN` to create conditional statements
+- If product_id = 1, then every $1 price multiply by 20 points
+- All other product_id that is not 1, multiply $1 by 10 points
+- Using `total`, SUM the point
+
+#### Answer :
+- Total points for Customer A is 860
+- Total points for Customer B is 940
+- Total points for Customer C is 360
+----
 
 #### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
-First Step : calculate the total points for each customer as in number 9
+#### 1st Step :
+- Create `CTE` then find out customer's first week after join the program (which is 6 days after `join_date`) and `end_month' of Jan 2021 (which is ‘2021–01–31’)
 
 ````sql
-WITH total AS(
-	SELECT s.customer_id,
-		order_date,
-		CASE WHEN product_name = 'sushi' THEN sum(price*20)
-			else sum(price*10)
-		END as point
-	FROM dannys_dinner.sales s
-	JOIN dannys_dinner.menu mn on s.product_id = mn.product_id
-	GROUP BY s.customer_id, order_date,product_name
+WITH dates_cte AS 
+(
+   SELECT *, 
+      date(join_date + integer '6') first_week, 
+      date('2021-01-31') end_month
+   FROM dannys_dinner.members mm
 ),
-total_point AS
-	SELECT customer_id,
-		order_date,
-		SUM(point)as total_point
-	FROM total
-	GROUP BY 1,2
-	ORDER BY 1,2
-)
 ````
-Once we get total_point, then we can get total points for each customer after they become a member
-- txn from 07/01 to 14/01 (7days) for A
-- txn from 09/01 to 16/01 (7days)for B. So we use interval 2 days
-
-Then we need to get total point until the end of January so we can use CASE WHEN function and Interval function to retrieve data
+#### 2nd Step :
+Our assumptions are:
+- On Day -X to Day 1 (customer becomes member on Day 1 join_date), each $1 spent is 10 points and each $1 spent is 20 points for sushi.
+- On Day 1 join_date to Day 7 valid_date, each $1 spent for all items is 20 points.
+- On Day 8 to end_month of Jan 2021, each $1 spent is 10 points and sushi is 20 points.
 
 ````sql
-	SELECT mm.customer_id,
-		SUM(CASE WHEN order_date >= join_date 
-				AND order_date < join_date + (7*INTERVAL '2 day')
-				THEN total_point *2
-			else total_point
-		END)as total_new_point
-	FROM total_point t
-	JOIN dannys_dinner.members mm ON t.customer_id = mm.customer_id
-	WHERE DATE_PART('month',order_date) = 1
-	GROUP BY 1
-	ORDER BY 1;
+point AS(
+SELECT d.customer_id, s.order_date, d.join_date, d.first_week, d.end_month, m.product_name, m.price,
+   SUM(CASE
+      WHEN m.product_name = 'sushi' THEN 2 * 10 * m.price
+      WHEN s.order_date BETWEEN d.join_date AND d.first_week THEN 2 * 10 * m.price
+      ELSE 10 * m.price
+      END) points
+FROM dates_cte d
+JOIN dannys_dinner.sales s ON d.customer_id = s.customer_id
+JOIN dannys_dinner.menu m ON s.product_id = m.product_id
+WHERE s.order_date < d.end_month
+GROUP BY 1,2,3,4,5,6,7
+)
+	SELECT customer_id,
+		SUM(points)as total_point
+	FROM point		
+	GROUP BY 1;	
 ````
-Hence, we get total point of A at the end of January is 1370 and 1140 for B
+#### Answer :
+- Total points for Customer A is 1,370
+- Total points for Customer B is 820
+----
 
+## Bonus Question
 
--- Bonus Question
-
-11. Join all the things
+#### 11. Join all the things
 
 ````sql
 SELECT t1.customer_id, order_date,
@@ -321,7 +326,7 @@ LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
 LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id;
 ````
 
-12. Rank all the things
+#### 12. Rank all the things
 
 ````sql
 WITH index_rn AS (
