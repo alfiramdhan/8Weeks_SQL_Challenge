@@ -325,7 +325,7 @@ FROM dannys_dinner.sales t1
 LEFT JOIN dannys_dinner.menu t2 ON t1.product_id = t2.product_id
 LEFT JOIN dannys_dinner.members t3 ON t1.customer_id = t3.customer_id;
 ````
-
+----
 #### 12. Rank all the things
 
 ````sql
@@ -343,5 +343,4 @@ CASE WHEN members = 'N' THEN null
 ELSE RANK () OVER (PARTITION BY customer_id,members ORDER BY order_date)
 END as ranking FROM index_rn ;
 ````
-
---
+----
