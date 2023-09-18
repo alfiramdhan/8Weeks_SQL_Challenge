@@ -21,7 +21,7 @@ Transforms the data in the customer_orders table by replacing specific values in
 It then creates a temporary table (customer_orders_cleaned) with the cleaned data
 */
 
-DROP TABLE IF EXISTS customer_orders_cleaned
+DROP TABLE IF EXISTS customer_orders_cleaned;
 CREATE TEMP TABLE customer_orders_cleaned AS
 SELECT order_id,
 		customer_id,
@@ -61,7 +61,7 @@ SELECT order_id,
 		CASE WHEN duration = 'null' THEN NULL
 			 ELSE duration
 		END as duration,
-		CASE WHEN cancellation = 'null' THEN NULL
+		CASE WHEN cancellation = 'null' OR cancellation = '' THEN NULL
 			 ELSE cancellation
 		END as cancellation
 FROM pizza_runner.runner_orders
