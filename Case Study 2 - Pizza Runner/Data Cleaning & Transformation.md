@@ -68,7 +68,7 @@ FROM pizza_runner.runner_orders
 )	
 	SELECT order_id,
 			runner_id,
-			CAST(pickup_time as DATE)as pickup_time,
+			CAST(pickup_time as TIMESTAMP)as pickup_time,
 			CAST((REGEXP_REPLACE(distance, '[a-z]+','')) as DECIMAL(5,2))as distance,
 			CAST((REGEXP_REPLACE(duration, '[a-z]+','')) as INT)as duration,
 			cancellation
