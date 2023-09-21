@@ -2,7 +2,7 @@
 - Ordering and Alias
 - Aggregate Function
 - Date Function
-- SQL Data Cleaning
+- SQL Data Cleaning & Transformation
 - JOIN
 - CASE WHEN
 - CTE
